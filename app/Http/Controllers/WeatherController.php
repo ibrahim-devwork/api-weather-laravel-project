@@ -4,21 +4,21 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\GetCurrentWeatherRequest;
 use App\Http\Requests\GetWeatherForecastRequest;
+use App\Services\GetCurrentWeatherService;
 use App\Services\GetForecastWeatherDataService;
-use App\Services\GetWeatherService;
 use Illuminate\Support\Facades\Log;
 
 class WeatherController extends Controller
 {
-    protected $getWeatherService;
+    protected $getCurrentWeatherService;
     protected $getForecastWeatherDataService;
 
     public function __construct(
-        GetWeatherService $getWeatherService,
+        GetCurrentWeatherService $getCurrentWeatherService,
         GetForecastWeatherDataService $getForecastWeatherDataService
     ) {
 
-        $this->getWeatherService             = $getWeatherService;
+        $this->getCurrentWeatherService             = $getCurrentWeatherService;
         $this->getForecastWeatherDataService = $getForecastWeatherDataService;
     }
 
@@ -28,7 +28,7 @@ class WeatherController extends Controller
 
             $validated_data  = $getCurrentWeatherRequest->validated();
 
-            $weatherResult = $this->getWeatherService->GetWeather($validated_data['location'], $validated_data['units']);
+            $weatherResult = $this->getCurrentWeatherService->GetWeather($validated_data['location'], $validated_data['units']);
 
             $units         = ($validated_data['units'] === 'metric' ? 'C' : 'F');
             return [
@@ -49,11 +49,10 @@ class WeatherController extends Controller
 
             $validated_data       = $getWeatherForecastRequest->validated();
             $result               = $this->getForecastWeatherDataService->getForecastWeatherData($validated_data);
-            $weatherResult[]      = $result['weatherResult'];
-            $forecastDataResult[] = $result['forecastData'];
-        
+            $forecastDataResult[] = $result;
+            
             return [
-                'location' => "{$weatherResult['city']['name']} ({$weatherResult['city']['country']})",
+                'location' => $validated_data['location'],
                 'forecast' => $forecastDataResult,
             ];
 

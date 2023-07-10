@@ -3,20 +3,21 @@
 namespace App\Console\Commands;
 
 use App\Enums\WeatherApiKeyEnum;
-use App\Services\GetWeatherService;
+use App\Services\GetForecastWeatherDataService;
 use Illuminate\Console\Command;
 use GuzzleHttp\Client;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class GetWeatherForecastCommand extends Command
 {
 
-    protected $getWeatherService;
+    protected $getForecastWeatherDataService;
 
-    public function __construct(GetWeatherService $getWeatherService)
+    public function __construct(GetForecastWeatherDataService $getForecastWeatherDataService)
     {
         parent::__construct();
-        $this->getWeatherService = $getWeatherService;
+        $this->getForecastWeatherDataService = $getForecastWeatherDataService;
     }
     
     /**
@@ -44,14 +45,14 @@ class GetWeatherForecastCommand extends Command
             $days       = min($this->option('days'), 5);
             $units      = $this->option('units');
 
-            $data = $this->getWeatherService->GetWeather($location, $units);
-
-            $this->info("{$data['city']['name']} ({$data['city']['country']})");
-
-            foreach ($data['list'] as $index => $forecast) {
-                if ($index >= $days) {
+            $forecastData = $this->getForecastWeatherDataService->getForecastWeather($location, $units, $days);
+            $this->info($forecastData['city']['name'].' ('.$forecastData['city']['country'].')');
+            
+            foreach ($forecastData['list'] as $key => $forecast) {
+                if ($key >= $days) {
                     break;
                 }
+                Log::info($forecast['dt']); 
 
                 $date           = date('M d, Y', $forecast['dt']);
                 $weather        = $forecast['weather'][0]['description'];
@@ -59,9 +60,8 @@ class GetWeatherForecastCommand extends Command
 
                 $this->line($date);
                 $this->line("> Weather: $weather");
-                $this->line("> Temperature: $temperature °{$units}");
                 $this->line('> Temperature: ' . $temperature .' °' . ($units === 'metric' ? 'C' : 'F'));
-
+                $date=null;
             }
 
         } catch(\Exception $error) {

@@ -3,18 +3,18 @@
 namespace App\Console\Commands;
 
 
-use App\Services\GetWeatherService;
+use App\Services\GetCurrentWeatherService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
 class GetCurrentWeatherCommand extends Command
 {
-    protected $getWeatherService;
+    protected $getCurrentWeatherService;
 
-    public function __construct(GetWeatherService $getWeatherService)
+    public function __construct(GetCurrentWeatherService $getCurrentWeatherService)
     {
         parent::__construct();
-        $this->getWeatherService = $getWeatherService;
+        $this->getCurrentWeatherService = $getCurrentWeatherService;
     }
 
     /**
@@ -41,12 +41,13 @@ class GetCurrentWeatherCommand extends Command
             $location    = $this->argument('location');
             $units       =  $this->option('units');
 
-            $weatherData = $this->getWeatherService->GetWeather($location, $units);
+            $weatherData = $this->getCurrentWeatherService->GetWeather($location, $units);
+
+            Log::info($weatherData);
 
             $this->info("{$weatherData['name']} ({$weatherData['sys']['country']})");
             $this->line(date('M d, Y', $weatherData['dt']));
             $this->line("> Weather: {$weatherData['weather'][0]['description']}");
-            $this->line("> Temperature: {$weatherData['main']['temp']} °{$units}");
             $this->line('> Temperature: '.$weatherData['main']['temp'].' °'.($units === 'metric' ? 'C' : 'F'));
 
         } catch(\Exception $error) {
