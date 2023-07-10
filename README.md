@@ -1,4 +1,4 @@
-# First of all you need to change key of Openweathermap to your key in this file :
+## First of all you need to change key of Openweathermap to your key in this file :
     App\Enums\WeatherApiKeyEnum.php
 
 ##  This command to run current weather command :
