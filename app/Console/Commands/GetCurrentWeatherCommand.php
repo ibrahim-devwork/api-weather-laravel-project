@@ -43,8 +43,6 @@ class GetCurrentWeatherCommand extends Command
 
             $weatherData = $this->getCurrentWeatherService->GetWeather($location, $units);
 
-            Log::info($weatherData);
-
             $this->info("{$weatherData['name']} ({$weatherData['sys']['country']})");
             $this->line(date('M d, Y', $weatherData['dt']));
             $this->line("> Weather: {$weatherData['weather'][0]['description']}");

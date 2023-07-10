@@ -48,20 +48,23 @@ class GetWeatherForecastCommand extends Command
             $forecastData = $this->getForecastWeatherDataService->getForecastWeather($location, $units, $days);
             $this->info($forecastData['city']['name'].' ('.$forecastData['city']['country'].')');
             
+            $previousDate = null;
             foreach ($forecastData['list'] as $key => $forecast) {
-                if ($key >= $days) {
-                    break;
+                $date    = date('M d, Y', $forecast['dt']);
+                if ($previousDate !== $date) {
+                    $previousDate = $date;
+                    $weather        = $forecast['weather'][0]['description'];
+                    $temperature    = $forecast['main']['temp'];
+
+                    $this->line($date);
+                    $this->line("> Weather: $weather");
+                    $this->line('> Temperature: ' . $temperature .' °' . ($units === 'metric' ? 'C' : 'F'));
+
+                    $days--;
+                    if ($days == 0) {
+                        break;
+                    }
                 }
-                Log::info($forecast['dt']); 
-
-                $date           = date('M d, Y', $forecast['dt']);
-                $weather        = $forecast['weather'][0]['description'];
-                $temperature    = $forecast['main']['temp'];
-
-                $this->line($date);
-                $this->line("> Weather: $weather");
-                $this->line('> Temperature: ' . $temperature .' °' . ($units === 'metric' ? 'C' : 'F'));
-                $date=null;
             }
 
         } catch(\Exception $error) {
