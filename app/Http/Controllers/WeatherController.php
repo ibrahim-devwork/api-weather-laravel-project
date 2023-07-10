@@ -30,11 +30,12 @@ class WeatherController extends Controller
 
             $weatherResult = $this->getWeatherService->GetWeather($validated_data['location'], $validated_data['units']);
 
+            $units         = ($validated_data['units'] === 'metric' ? 'C' : 'F');
             return [
                 'location'      => "{$weatherResult['name']} ({$weatherResult['sys']['country']})",
                 'date'          => date('M d, Y'),
                 'weather'       => $weatherResult['weather'][0]['description'],
-                'temperature'   => "{$weatherResult['main']['temp']} °{$validated_data['units']}",
+                'temperature'   => "{$weatherResult['main']['temp']} °{$units}",
             ];
 
         } catch(\Exception $error) {

@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 
 use App\Services\GetWeatherService;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 
 class GetCurrentWeatherCommand extends Command
 {
@@ -35,14 +36,22 @@ class GetCurrentWeatherCommand extends Command
      */
     public function handle()
     {
-        $location   = $this->argument('location');
-        $units      =  $this->option('units');
+        try {
 
-        $data = $this->getWeatherService->GetWeather($location, $units);
+            $location    = $this->argument('location');
+            $units       =  $this->option('units');
 
-        $this->info("{$data['name']} ({$data['sys']['country']})");
-        $this->line(date('M d, Y'));
-        $this->line("> Weather: {$data['weather'][0]['description']}");
-        $this->line("> Temperature: {$data['main']['temp']} °{$units}");
+            $weatherData = $this->getWeatherService->GetWeather($location, $units);
+
+            $this->info("{$weatherData['name']} ({$weatherData['sys']['country']})");
+            $this->line(date('M d, Y', $weatherData['dt']));
+            $this->line("> Weather: {$weatherData['weather'][0]['description']}");
+            $this->line("> Temperature: {$weatherData['main']['temp']} °{$units}");
+            $this->line('> Temperature: '.$weatherData['main']['temp'].' °'.($units === 'metric' ? 'C' : 'F'));
+
+        } catch(\Exception $error) {
+            Log::error("GetCurrentWeatherCommand - (handle) : " . $error->getMessage());
+        }
+        
     }
 }

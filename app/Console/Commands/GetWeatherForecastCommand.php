@@ -6,6 +6,7 @@ use App\Enums\WeatherApiKeyEnum;
 use App\Services\GetWeatherService;
 use Illuminate\Console\Command;
 use GuzzleHttp\Client;
+use Illuminate\Support\Facades\Log;
 
 class GetWeatherForecastCommand extends Command
 {
@@ -37,27 +38,34 @@ class GetWeatherForecastCommand extends Command
      */
     public function handle()
     {
+        try {
 
-        $location   = $this->argument('location');
-        $days       = min($this->option('days'), 5);
-        $units      = $this->option('units');
+            $location   = $this->argument('location');
+            $days       = min($this->option('days'), 5);
+            $units      = $this->option('units');
 
-        $data = $this->getWeatherService->GetWeather($location, $units);
+            $data = $this->getWeatherService->GetWeather($location, $units);
 
-        $this->info("{$data['city']['name']} ({$data['city']['country']})");
+            $this->info("{$data['city']['name']} ({$data['city']['country']})");
 
-        foreach ($data['list'] as $index => $forecast) {
-            if ($index >= $days) {
-                break;
+            foreach ($data['list'] as $index => $forecast) {
+                if ($index >= $days) {
+                    break;
+                }
+
+                $date           = date('M d, Y', $forecast['dt']);
+                $weather        = $forecast['weather'][0]['description'];
+                $temperature    = $forecast['main']['temp'];
+
+                $this->line($date);
+                $this->line("> Weather: $weather");
+                $this->line("> Temperature: $temperature °{$units}");
+                $this->line('> Temperature: ' . $temperature .' °' . ($units === 'metric' ? 'C' : 'F'));
+
             }
 
-            $date = date('M d, Y', $forecast['dt']);
-            $weather = $forecast['weather'][0]['description'];
-            $temperature = $forecast['main']['temp'];
-
-            $this->line($date);
-            $this->line("> Weather: $weather");
-            $this->line("> Temperature: $temperature °{$units}");
+        } catch(\Exception $error) {
+            Log::error("GetWeatherForecastCommand - (handle) : " . $error->getMessage());
         }
     }
 }
