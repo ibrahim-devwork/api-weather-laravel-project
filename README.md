@@ -1,8 +1,11 @@
-#  Run this command current weather command :
+# First of all you need to change key of Openweathermap to your key in this file :
+    App\Enums\WeatherApiKeyEnum.php
+
+##  This command to run current weather command :
     php artisan current Havana,CU --units=imperial
 
-#  Run this command for forecast command :
+##  This command to run forecast weather command :
     php artisan forecast Madrid,ES --days=5 --units=imperial
 
-#  Run this command for forecast ask command :
+##  This command to run forecast ask weather command :
     php artisan forecast:ask Madrid,ES --days=5 --units=imperial
