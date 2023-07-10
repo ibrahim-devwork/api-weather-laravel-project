@@ -20,5 +20,5 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 // Weather apis
-Route::get("/weather/current/{location}",   [WeatherController::class, "getCurrentWeather"]);
-Route::get("/weather/forecast/{location}",  [WeatherController::class, "getWeatherForecast"]);
+Route::get("/current-weather/{location}",   [WeatherController::class, "getCurrentWeather"]);
+Route::get("/forecast-weather/{location}",  [WeatherController::class, "getWeatherForecast"]);
