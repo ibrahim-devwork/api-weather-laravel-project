@@ -2,6 +2,8 @@
 
 namespace App\Console;
 
+use App\Console\Commands\GetCurrentWeatherCommand;
+use App\Console\Commands\GetWeatherForecastCommand;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -24,4 +26,9 @@ class Kernel extends ConsoleKernel
 
         require base_path('routes/console.php');
     }
+
+    protected $commands = [
+        GetCurrentWeatherCommand::class,
+        GetWeatherForecastCommand::class
+    ];
 }
